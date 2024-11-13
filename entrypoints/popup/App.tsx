@@ -1,34 +1,39 @@
-import { useState } from 'react';
-import reactLogo from '@/assets/react.svg';
-import wxtLogo from '/wxt.svg';
-import './App.css';
+import { Input, Button, Space, List, Flex } from "antd";
+import { configStore, wordLibraryStore } from "../store";
+import { useStore } from "zustand";
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [token, setToken] = useState("");
+  const { apiToken, setApiToken } = useStore(configStore);
+
+  useEffect(() => {
+    setToken(apiToken);
+  }, [apiToken]);
+
+  const [words, setWords] = useState<string[]>([]);
+  const { wordLibrary } = useStore(wordLibraryStore);
+
+  useEffect(() => {
+    setWords(wordLibrary[0].words);
+  }, [wordLibrary]);
 
   return (
-    <>
-      <div>
-        <a href="https://wxt.dev" target="_blank">
-          <img src={wxtLogo} className="logo" alt="WXT logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>WXT + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the WXT and React logos to learn more
-      </p>
-    </>
+    <Flex vertical gap={"small"} style={{ width: 300 }}>
+      <Space size={"small"} direction="horizontal">
+        <Input.Password
+          value={token}
+          onChange={(e) => setToken(e.target.value)}
+        />
+        <Button type="primary" onClick={() => setApiToken(token)}>
+          Set API Token
+        </Button>
+      </Space>
+      <List
+        bordered
+        dataSource={words}
+        renderItem={(item) => <List.Item>{item}</List.Item>}
+      />
+    </Flex>
   );
 }
 
