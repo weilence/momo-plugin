@@ -1,6 +1,4 @@
 import ky from "ky";
-import config from "./config";
-import { configStore } from "./store";
 
 export default ky.extend({
   prefixUrl: config.prefixUrl,
