@@ -5,12 +5,15 @@ function App() {
   const [token, setToken] = useState("");
   const { apiToken, setApiToken } = useStore(configStore);
 
+  const [isEditing, setIsEditing] = useState(false);
+
   useEffect(() => {
     setToken(apiToken);
   }, [apiToken]);
 
   const [words, setWords] = useState<string[]>([]);
-  const { wordLibrary, deleteWord } = useStore(wordLibraryStore);
+  const { wordLibrary, syncing, deleteWord, syncWordLibrary } =
+    useStore(wordLibraryStore);
 
   useEffect(() => {
     setWords(wordLibrary[0].words);
@@ -19,16 +22,39 @@ function App() {
   return (
     <Flex vertical gap={"small"} style={{ width: 300 }}>
       <Space size={"small"} direction="horizontal">
-        <Input.Password
-          value={token}
-          onChange={(e) => setToken(e.target.value)}
-        />
-        <Button type="primary" onClick={() => setApiToken(token)}>
-          Set API Token
-        </Button>
+        {!apiToken || isEditing ? (
+          <>
+            <Input.Password
+              value={token}
+              onChange={(e) => setToken(e.target.value)}
+              placeholder="API Token"
+            />
+            <Button
+              type="primary"
+              onClick={() => {
+                setApiToken(token);
+                setIsEditing(false);
+              }}
+            >
+              Save
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button
+              type="primary"
+              onClick={async () => {
+                await syncWordLibrary();
+              }}
+              loading={syncing}
+            >
+              Sync Word Library
+            </Button>
+            <Button onClick={() => setIsEditing(true)}>Edit Token</Button>
+          </>
+        )}
       </Space>
       <List
-        bordered
         dataSource={words}
         renderItem={(item, index) => (
           <List.Item
