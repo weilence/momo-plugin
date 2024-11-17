@@ -2,7 +2,7 @@
   "name": "momo-plugin",
   "description": "墨墨背单词软件的浏览器插件，可以将网页上的单词添加到单词本",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "author": "Weilence <weilence@163.com> (https://github.com/weilence)",
   "scripts": {
