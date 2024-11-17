@@ -1,4 +1,4 @@
-import { Input, Button, Space, List, Flex } from "antd";
+import { Input, Button, Space, List, Flex, message } from "antd";
 import { useStore } from "zustand";
 
 function App() {
@@ -19,62 +19,73 @@ function App() {
     setWords(wordLibrary[0].words);
   }, [wordLibrary]);
 
+  const [messageApi, contextHolder] = message.useMessage();
+
   return (
-    <Flex vertical gap={"small"} style={{ width: 300 }}>
-      <Space size={"small"} direction="horizontal">
-        {!apiToken || isEditing ? (
-          <>
-            <Input.Password
-              value={token}
-              onChange={(e) => setToken(e.target.value)}
-              placeholder="API Token"
-            />
-            <Button
-              type="primary"
-              onClick={() => {
-                setApiToken(token);
-                setIsEditing(false);
-              }}
-            >
-              Save
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button
-              type="primary"
-              onClick={async () => {
-                await syncWordLibrary();
-              }}
-              loading={syncing}
-            >
-              Sync Word Library
-            </Button>
-            <Button onClick={() => setIsEditing(true)}>Edit Token</Button>
-          </>
-        )}
-      </Space>
-      <List
-        dataSource={words}
-        renderItem={(item, index) => (
-          <List.Item
-            actions={[
+    <>
+      {contextHolder}
+      <Flex vertical gap={"small"} style={{ width: 300 }}>
+        <Space size={"small"} direction="horizontal">
+          {!apiToken || isEditing ? (
+            <>
+              <Input.Password
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
+                placeholder="API Token"
+              />
               <Button
-                type="link"
-                danger
+                type="primary"
                 onClick={() => {
-                  deleteWord(index);
+                  setApiToken(token);
+                  setIsEditing(false);
                 }}
               >
-                Remove
-              </Button>,
-            ]}
-          >
-            {item}
-          </List.Item>
-        )}
-      />
-    </Flex>
+                Save
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                type="primary"
+                onClick={async () => {
+                  try {
+                    await syncWordLibrary();
+                    messageApi.success("Word library synced");
+                  } catch (error) {
+                    console.error(error);
+                    messageApi.error("Failed to sync word library");
+                  }
+                }}
+                loading={syncing}
+              >
+                Sync Word Library
+              </Button>
+              <Button onClick={() => setIsEditing(true)}>Edit Token</Button>
+            </>
+          )}
+        </Space>
+        <List
+          dataSource={words}
+          renderItem={(item, index) => (
+            <List.Item
+              actions={[
+                <Button
+                  type="link"
+                  danger
+                  onClick={() => {
+                    deleteWord(index);
+                  }}
+                >
+                  Remove
+                </Button>,
+              ]}
+            >
+              {item}
+            </List.Item>
+          )}
+        />
+      </Flex>
+    </>
   );
 }
 
