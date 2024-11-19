@@ -1,6 +1,4 @@
-export default defineBackground(() => {});
-
-browser.runtime.onInstalled.addListener(() => {
+export default defineBackground(() => {
   browser.contextMenus.create({
     id: "addToWordLibrary",
     title: "Add to Word Library",
