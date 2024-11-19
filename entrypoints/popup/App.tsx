@@ -1,23 +1,23 @@
+import { syncWordLibrary } from "@/utils/api";
 import { Input, Button, Space, List, Flex, message } from "antd";
-import { useStore } from "zustand";
+import { produce } from "immer";
 
 function App() {
-  const [token, setToken] = useState("");
-  const { apiToken, setApiToken } = useStore(configStore);
-
+  const [apiToken, setApiToken] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-
-  useEffect(() => {
-    setToken(apiToken);
-  }, [apiToken]);
-
   const [words, setWords] = useState<string[]>([]);
-  const { wordLibrary, syncing, deleteWord, syncWordLibrary } =
-    useStore(wordLibraryStore);
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
-    setWords(wordLibrary[0].words);
-  }, [wordLibrary]);
+    const func = async () => {
+      const apiToken = (await storage.getItem<string>("local:apiToken")) || "";
+      setApiToken(apiToken);
+      const words = (await storage.getItem<string[]>("local:words")) || [];
+      setWords(words);
+    };
+
+    func();
+  }, []);
 
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -29,14 +29,14 @@ function App() {
           {!apiToken || isEditing ? (
             <>
               <Input.Password
-                value={token}
-                onChange={(e) => setToken(e.target.value)}
+                value={apiToken}
+                onChange={(e) => setApiToken(e.target.value)}
                 placeholder="API Token"
               />
               <Button
                 type="primary"
-                onClick={() => {
-                  setApiToken(token);
+                onClick={async () => {
+                  await storage.setItem("local:apiToken", apiToken);
                   setIsEditing(false);
                 }}
               >
@@ -48,12 +48,15 @@ function App() {
               <Button
                 type="primary"
                 onClick={async () => {
+                  setSyncing(true);
                   try {
-                    await syncWordLibrary();
+                    await syncWordLibrary(words);
                     messageApi.success("Word library synced");
                   } catch (error) {
                     console.error(error);
                     messageApi.error("Failed to sync word library");
+                  } finally {
+                    setSyncing(false);
                   }
                 }}
                 loading={syncing}
@@ -73,7 +76,12 @@ function App() {
                   type="link"
                   danger
                   onClick={() => {
-                    deleteWord(index);
+                    setWords(
+                      produce((draft) => {
+                        draft.splice(index, 1);
+                        storage.setItem("local:words", [...draft]);
+                      })
+                    );
                   }}
                 >
                   Remove

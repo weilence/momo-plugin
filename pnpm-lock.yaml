@@ -8,6 +8,9 @@ dependencies:
   antd:
     specifier: ^5.21.6
     version: 5.21.6(react-dom@18.3.1)(react@18.3.1)
+  immer:
+    specifier: ^10.1.1
+    version: 10.1.1
   ky:
     specifier: ^1.7.2
     version: 1.7.2
@@ -19,7 +22,7 @@ dependencies:
     version: 18.3.1(react@18.3.1)
   zustand:
     specifier: ^5.0.1
-    version: 5.0.1(@types/react@18.3.12)(react@18.3.1)
+    version: 5.0.1(@types/react@18.3.12)(immer@10.1.1)(react@18.3.1)
 
 devDependencies:
   '@types/chrome':
@@ -2280,6 +2283,10 @@ packages:
   /immediate@3.0.6:
     resolution: {integrity: sha512-XXOFtyqDjNDAQxVfYxuF7g9Il/IbWmmlQg2MYKOH8ExIT1qg6xc4zyS3HaEEATgs1btfzxq15ciUiY7gjSXRGQ==}
     dev: true
+
+  /immer@10.1.1:
+    resolution: {integrity: sha512-s2MPrmjovJcoMaHtx6K11Ra7oD05NT97w1IC5zpMkT6Atjr7H8LjaDd81iIxUYpMKSRRNMJE703M1Fhr/TctHw==}
+    dev: false
 
   /import-lazy@4.0.0:
     resolution: {integrity: sha512-rKtvo6a868b5Hu3heneU+L4yEQ4jYKLtjpnPeUdK7h0yzXGmyBTypknlkCvHFBqfX9YlorEiMM6Dnq/5atfHkw==}
@@ -4747,7 +4754,7 @@ packages:
     resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
     dev: true
 
-  /zustand@5.0.1(@types/react@18.3.12)(react@18.3.1):
+  /zustand@5.0.1(@types/react@18.3.12)(immer@10.1.1)(react@18.3.1):
     resolution: {integrity: sha512-pRET7Lao2z+n5R/HduXMio35TncTlSW68WsYBq2Lg1ASspsNGjpwLAsij3RpouyV6+kHMwwwzP0bZPD70/Jx/w==}
     engines: {node: '>=12.20.0'}
     peerDependencies:
@@ -4766,5 +4773,6 @@ packages:
         optional: true
     dependencies:
       '@types/react': 18.3.12
+      immer: 10.1.1
       react: 18.3.1
     dev: false

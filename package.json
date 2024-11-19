@@ -1,6 +1,6 @@
 {
   "name": "momo-plugin",
-  "description": "墨墨背单词软件的浏览器插件，可以将网页上的单词添加到单词本",
+  "description": "墨墨背单词的浏览器插件，可以将网页上的单词添加到单词本",
   "private": true,
   "version": "0.0.1",
   "type": "module",
@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "antd": "^5.21.6",
+    "immer": "^10.1.1",
     "ky": "^1.7.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
