@@ -14,6 +14,9 @@ export default defineBackground(() => {
 
       words.push(info.selectionText);
       await storage.setItem("local:words", words);
+      if (tab?.id) {
+        browser.tabs.sendMessage(tab.id, { action: "add-word" });
+      }
     }
   });
 });
