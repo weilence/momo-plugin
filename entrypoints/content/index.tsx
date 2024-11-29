@@ -1,4 +1,5 @@
 import "@/assets/style.css";
+import "@/node_modules/sonner/dist/styles.css";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 

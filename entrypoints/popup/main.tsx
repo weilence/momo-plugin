@@ -1,12 +1,13 @@
+import "@/assets/style.css";
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
-import { ConfigProvider } from "antd";
+import { Toaster } from "@/components/ui/sonner.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ConfigProvider componentSize={"small"}>
-      <App />
-    </ConfigProvider>
+    <Toaster richColors theme="light" position="top-center" closeButton />
+    <App />
   </React.StrictMode>
 );

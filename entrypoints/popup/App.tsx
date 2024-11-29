@@ -1,5 +1,6 @@
+import { Input } from "@/components/ui/input";
 import { syncWordLibrary } from "@/utils/api";
-import { Input, Button, Space, List, Flex, message } from "antd";
+import { toast } from "sonner";
 import { produce } from "immer";
 
 function App() {
@@ -19,81 +20,75 @@ function App() {
     func();
   }, []);
 
-  const [messageApi, contextHolder] = message.useMessage();
-
   return (
-    <>
-      {contextHolder}
-      <Flex vertical gap={"small"} style={{ width: 300 }}>
-        <Space size={"small"} direction="horizontal">
-          {!apiToken || isEditing ? (
-            <>
-              <Input.Password
-                value={apiToken}
-                onChange={(e) => setApiToken(e.target.value)}
-                placeholder="API Token"
-              />
-              <Button
-                type="primary"
-                onClick={async () => {
-                  await storage.setItem("local:apiToken", apiToken);
-                  setIsEditing(false);
-                }}
-              >
-                Save
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                type="primary"
-                onClick={async () => {
-                  setSyncing(true);
-                  try {
-                    await syncWordLibrary(words);
-                    messageApi.success("Word library synced");
-                  } catch (error) {
-                    console.error(error);
-                    messageApi.error("Failed to sync word library");
-                  } finally {
-                    setSyncing(false);
-                  }
-                }}
-                loading={syncing}
-              >
-                Sync Word Library
-              </Button>
-              <Button onClick={() => setIsEditing(true)}>Edit Token</Button>
-            </>
-          )}
-        </Space>
-        <List
-          dataSource={words}
-          renderItem={(item, index) => (
-            <List.Item
-              actions={[
-                <Button
-                  type="link"
-                  danger
-                  onClick={() => {
-                    setWords(
-                      produce((draft) => {
-                        draft.splice(index, 1);
-                        storage.setItem("local:words", [...draft]);
-                      })
-                    );
-                  }}
-                >
-                  Remove
-                </Button>,
-              ]}
+    <div className="flex flex-col w-[300px] gap-y-1 p-1">
+      <div className="space-y-2">
+        {!apiToken || isEditing ? (
+          <div className="flex w-full max-w-sm items-center space-x-1">
+            <Input
+              className="h-8 text-sm"
+              type="password"
+              value={apiToken}
+              onChange={(e) => setApiToken(e.target.value)}
+              placeholder="API Token"
+            />
+            <Button
+              size={"sm"}
+              onClick={async () => {
+                await storage.setItem("local:apiToken", apiToken);
+                setIsEditing(false);
+              }}
             >
-              {item}
-            </List.Item>
-          )}
-        />
-      </Flex>
-    </>
+              Save
+            </Button>
+          </div>
+        ) : (
+          <div className="flex w-full max-w-sm items-center space-x-1">
+            <Button
+              loading={syncing}
+              color="red-500"
+              size={"sm"}
+              onClick={async () => {
+                setSyncing(true);
+                try {
+                  await syncWordLibrary(words);
+                  toast.success("Word library synced");
+                } catch (error) {
+                  toast.error("Failed to sync word library");
+                } finally {
+                  setSyncing(false);
+                }
+              }}
+            >
+              Sync Word Library
+            </Button>
+            <Button size={"sm"} onClick={() => setIsEditing(true)}>
+              Edit Token
+            </Button>
+          </div>
+        )}
+      </div>
+      {words.map((word, index) => (
+        <p key={index} className="flex items-center px-1 border rounded-md">
+          <span className="flex-auto pl-2">{word}</span>
+          <Button
+            className="text-red-500"
+            size={"sm"}
+            variant={"link"}
+            onClick={() => {
+              setWords(
+                produce((draft) => {
+                  draft.splice(index, 1);
+                  storage.setItem("local:words", [...draft]);
+                })
+              );
+            }}
+          >
+            Remove
+          </Button>
+        </p>
+      ))}
+    </div>
   );
 }
 

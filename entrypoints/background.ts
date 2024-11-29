@@ -9,13 +9,15 @@ export default defineBackground(() => {
     if (info.menuItemId === "addToWordLibrary" && info.selectionText) {
       let words = (await storage.getItem<string[]>("local:words")) || [];
       if (words.includes(info.selectionText)) {
-        return;
-      }
-
-      words.push(info.selectionText);
-      await storage.setItem("local:words", words);
-      if (tab?.id) {
-        browser.tabs.sendMessage(tab.id, { action: "add-word" });
+        if (tab?.id) {
+          browser.tabs.sendMessage(tab.id, { action: "word-exist" });
+        }
+      } else {
+        words.push(info.selectionText);
+        await storage.setItem("local:words", words);
+        if (tab?.id) {
+          browser.tabs.sendMessage(tab.id, { action: "word-add" });
+        }
       }
     }
   });
