@@ -14,7 +14,6 @@ export default defineContentScript({
       anchor: "body",
       append: "first",
       onMount: (container) => {
-        console.log("content script loaded");
         const wrapper = document.createElement("div");
         container.append(wrapper);
 
