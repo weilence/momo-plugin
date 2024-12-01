@@ -1,12 +1,11 @@
-import { FC } from "react";
 import { Button as BaseButton, ButtonProps } from "./ui/button";
 import { Loader2 } from "lucide-react";
+import React from "react";
 
-const Button: FC<ButtonProps & { loading?: boolean }> = ({
-  children,
-  loading,
-  ...props
-}) => {
+const Button = React.forwardRef<
+  HTMLButtonElement,
+  ButtonProps & { loading?: boolean }
+>(({ children, loading, ...props }, ref) => {
   if (loading) {
     props.disabled = true;
     children = (
@@ -17,7 +16,11 @@ const Button: FC<ButtonProps & { loading?: boolean }> = ({
     );
   }
 
-  return <BaseButton {...props}>{children}</BaseButton>;
-};
+  return (
+    <BaseButton {...props} ref={ref}>
+      {children}
+    </BaseButton>
+  );
+});
 
 export { Button };
