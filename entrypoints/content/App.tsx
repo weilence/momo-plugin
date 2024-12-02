@@ -1,7 +1,5 @@
 import { Toaster } from "@/components/ui/sonner";
-import { Languages } from "lucide-react";
 import { toast } from "sonner";
-import TranslateButton from "./TranslateButton";
 
 browser.runtime.onMessage.addListener(async (message) => {
   const { action } = message;
@@ -13,10 +11,5 @@ browser.runtime.onMessage.addListener(async (message) => {
 });
 
 export default () => {
-  return (
-    <>
-      <Toaster richColors theme="light" position="top-center" closeButton />
-      <TranslateButton />
-    </>
-  );
+  return <Toaster richColors theme="light" position="top-center" closeButton />;
 };
