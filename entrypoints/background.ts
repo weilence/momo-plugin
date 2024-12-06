@@ -15,7 +15,7 @@ export default defineBackground(() => {
           browser.tabs.sendMessage(tab.id, { action: "word-exist" });
         }
       } else {
-        words.push(info.selectionText);
+        words.unshift(info.selectionText);
         await storage.setItem("local:words", words);
         if (tab?.id) {
           browser.tabs.sendMessage(tab.id, { action: "word-add" });

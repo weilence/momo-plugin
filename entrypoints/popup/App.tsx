@@ -1,7 +1,8 @@
 import { Input } from "@/components/ui/input";
-import { syncWordLibrary } from "@/utils/api";
+import { syncWordLibrary, testApiToken } from "@/utils/api";
 import { toast } from "sonner";
 import { produce } from "immer";
+import { Empty } from "@/components/Empty";
 
 function App() {
   const [apiToken, setApiToken] = useState("");
@@ -11,8 +12,6 @@ function App() {
 
   useEffect(() => {
     const func = async () => {
-      const apiToken = (await storage.getItem<string>("local:apiToken")) || "";
-      setApiToken(apiToken);
       const words = (await storage.getItem<string[]>("local:words")) || [];
       setWords(words);
     };
@@ -23,7 +22,7 @@ function App() {
   return (
     <div className="flex flex-col w-[300px] gap-y-1 p-1">
       <div className="space-y-2">
-        {!apiToken || isEditing ? (
+        {isEditing ? (
           <div className="flex w-full max-w-sm items-center space-x-1">
             <Input
               className="h-8 text-sm"
@@ -34,6 +33,20 @@ function App() {
             />
             <Button
               size={"sm"}
+              variant={"info"}
+              onClick={async () => {
+                const ok = await testApiToken(apiToken);
+                if (ok) {
+                  toast.success("API Token is valid");
+                } else {
+                  toast.error("API Token is invalid");
+                }
+              }}
+            >
+              Test
+            </Button>
+            <Button
+              size={"sm"}
               onClick={async () => {
                 await storage.setItem("local:apiToken", apiToken);
                 setIsEditing(false);
@@ -41,53 +54,81 @@ function App() {
             >
               Save
             </Button>
+            <Button
+              size={"sm"}
+              variant={"destructive"}
+              onClick={() => setIsEditing(false)}
+            >
+              Cancel
+            </Button>
           </div>
         ) : (
           <div className="flex w-full max-w-sm items-center space-x-1">
+            {
+              <Button
+                loading={syncing}
+                size={"sm"}
+                onClick={async () => {
+                  const storageApiToken =
+                    (await storage.getItem<string>("local:apiToken")) || "";
+                  if (!storageApiToken) {
+                    toast.error("API Token is required");
+                    return;
+                  }
+                  setSyncing(true);
+                  try {
+                    await syncWordLibrary(words);
+                    toast.success("Word library synced");
+                  } catch (error) {
+                    toast.error("Failed to sync word library");
+                  } finally {
+                    setSyncing(false);
+                  }
+                }}
+              >
+                Sync Word Library
+              </Button>
+            }
             <Button
-              loading={syncing}
-              color="red-500"
               size={"sm"}
               onClick={async () => {
-                setSyncing(true);
-                try {
-                  await syncWordLibrary(words);
-                  toast.success("Word library synced");
-                } catch (error) {
-                  toast.error("Failed to sync word library");
-                } finally {
-                  setSyncing(false);
-                }
+                const apiToken =
+                  (await storage.getItem<string>("local:apiToken")) || "";
+                setApiToken(apiToken);
+                setIsEditing(true);
               }}
             >
-              Sync Word Library
-            </Button>
-            <Button size={"sm"} onClick={() => setIsEditing(true)}>
               Edit Token
             </Button>
           </div>
         )}
       </div>
-      {words.map((word, index) => (
-        <p key={index} className="flex items-center px-1 border rounded-md">
-          <span className="flex-auto pl-2">{word}</span>
-          <Button
-            className="text-red-500"
-            size={"sm"}
-            variant={"link"}
-            onClick={() => {
-              setWords(
-                produce((draft) => {
-                  draft.splice(index, 1);
-                  storage.setItem("local:words", [...draft]);
-                })
-              );
-            }}
-          >
-            Remove
-          </Button>
-        </p>
-      ))}
+      <div className="max-h-[400px] flex flex-col gap-y-1 overflow-y-auto">
+        {words.length > 0 ? (
+          words.map((word, index) => (
+            <p key={index} className="flex items-center px-1 border rounded-md">
+              <span className="flex-auto pl-2">{word}</span>
+              <Button
+                className="text-red-500"
+                size={"sm"}
+                variant={"link"}
+                onClick={() => {
+                  setWords(
+                    produce((draft) => {
+                      draft.splice(index, 1);
+                      storage.setItem("local:words", [...draft]);
+                    })
+                  );
+                }}
+              >
+                Remove
+              </Button>
+            </p>
+          ))
+        ) : (
+          <Empty></Empty>
+        )}
+      </div>
     </div>
   );
 }

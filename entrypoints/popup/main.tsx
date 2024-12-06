@@ -7,7 +7,7 @@ import { Toaster } from "@/components/ui/sonner.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <Toaster richColors theme="light" position="top-center" closeButton />
+    <Toaster richColors theme="light" position="bottom-center" closeButton />
     <App />
   </React.StrictMode>
 );

@@ -11,6 +11,10 @@ const api = ky.extend({
   hooks: {
     beforeRequest: [
       async (request) => {
+        if (request.headers.has("Authorization")) {
+          return;
+        }
+
         const apiToken =
           (await storage.getItem<string>("local:apiToken")) || "";
 
@@ -74,5 +78,20 @@ export async function syncWordLibrary(words: string[]) {
     await api.post(`notepads/${pluginNotePad.id}`, {
       json: payload,
     });
+  }
+}
+
+export async function testApiToken(apiToken: string) {
+  try {
+    await api
+      .get("notepads", {
+        headers: {
+          Authorization: `Bearer ${apiToken}`,
+        },
+      })
+      .json();
+    return true;
+  } catch (error) {
+    return false;
   }
 }
